@@ -1,0 +1,29 @@
+{
+  "name": "tulip-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A personal AI representative: a guarded question-answering assistant that speaks on behalf of one person, from a private knowledge base you supply. Terminal client and Cloudflare Worker website. No runtime dependencies.",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"tests/*.spec.js\"",
+    "build": "node scripts/build_runtime.js",
+    "build:runtime": "node scripts/build_runtime.js",
+    "build:site": "node scripts/build_site.js",
+    "build:worker": "node scripts/build_worker.js",
+    "demo:build": "node scripts/build_runtime.js --example",
+    "demo": "node scripts/build_runtime.js --example && node src/cli.js --mock",
+    "chat": "node src/cli.js",
+    "chat:mock": "node src/cli.js --mock",
+    "check": "node scripts/check_access.js",
+    "probe": "node scripts/probe_reasoning.js",
+    "eval": "node scripts/run_eval.js",
+    "eval:mock": "node scripts/run_eval.js --mock",
+    "dev:mock": "node tests/helpers/dev_server.mjs",
+    "deploy": "node scripts/build_all.js && npx wrangler@latest deploy",
+    "verify:deployment": "node scripts/verify_deployment.js",
+    "check:private": "node scripts/check_private_data.js"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  // Personal AI assistant website. Free plan only: Workers + static assets + Workers AI binding + a SQLite Durable Object.
+  "name": "tulip-assistant",   // becomes https://tulip-assistant.<your-subdomain>.workers.dev
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "preview_urls": false,
+
+  // Renders public/ from site/ and rebuilds worker/generated/tulip_core.mjs (verifying your runtime knowledge files against the build manifest) before every deploy.
+  "build": { "command": "node scripts/build_all.js" },
+
+  // Static website. Only requests to /api/* run the Worker; everything else is served as a file and is not billed as a Worker request.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+
+  // Server-side model access. No API token is used or stored anywhere.
+  "ai": { "binding": "AI" },
+
+  // Usage limits (free-plan SQLite-backed Durable Object).
+  "durable_objects": { "bindings": [{ "name": "LIMITER", "class_name": "UsageLimiter" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["UsageLimiter"] }],
+
+  // Non-secret tuning values. Defaults live in worker/limits.mjs.
+  "vars": {
+    "LIMIT_PER_MINUTE": "6",
+    "LIMIT_PER_HOUR": "40",
+    "LIMIT_PER_DAY": "120",
+    "DAILY_NEURON_CAP": "8000",
+    "DAILY_REQUEST_CAP": "400"
+  },
+
+  "observability": { "enabled": false }
+}

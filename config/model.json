@@ -1,0 +1,25 @@
+{
+  "provider": "cloudflare-workers-ai",
+  "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+  "endpoint_style": "openai",
+  "max_tokens": 450,
+  "retry_max_tokens": 900,
+  "temperature": 0.3,
+  "max_retries": 1,
+  "timeout_ms": 60000,
+  "history": {
+    "max_turns": 6,
+    "max_user_chars": 1000,
+    "max_assistant_chars": 1500
+  },
+  "pricing_neurons_per_million_tokens": {
+    "input": 4625,
+    "output": 30475
+  },
+  "pricing_source": "Cloudflare Workers AI pricing page, checked 2026-10-01; may change",
+  "daily_free_neurons": 10000,
+  "local_daily_cap_estimated_neurons": 6000,
+  "prompt_version": "0.9",
+  "notes": "Neuron figures computed from reported token usage are ESTIMATES. Only the Cloudflare dashboard is authoritative.",
+  "max_claim_retries": 1
+}

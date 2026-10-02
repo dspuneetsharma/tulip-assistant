@@ -1,0 +1,33 @@
+# ---- Private knowledge and anything derived from it (NEVER commit) ----
+/knowledge_base/
+/worker/generated/
+/public/
+/evaluations/
+/logs/
+/messages/
+/reports/
+/checkpoints/
+/experiments/
+/export/
+/_to_delete/
+config/local_choices.json
+*.local.json
+.private-denylist.txt
+
+# ---- Credentials and local environment ----
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+.wrangler/
+*.key
+*.pem
+*token*.txt
+*secret*
+
+# ---- Misc ----
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

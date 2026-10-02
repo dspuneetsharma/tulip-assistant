@@ -1,0 +1,3 @@
+#!/bin/sh
+# Blocks commits that contain private-looking data. Enable once per clone:  git config core.hooksPath .githooks
+exec node scripts/check_private_data.js --staged

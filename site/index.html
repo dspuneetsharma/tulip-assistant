@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{assistant}}, {{owner}}'s AI assistant</title>
+<meta name="description" content="{{assistant}} is an AI assistant that answers questions about {{owner}}'s background, projects, skills and career goals.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#composer-input">Skip to the message box</a>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M16 6c-3.6 2.2-5.6 5-5.6 8.2 0 2.7 1.6 4.4 3.3 5.3V25h4.6v-5.5c1.7-.9 3.3-2.6 3.3-5.3C21.6 11 19.6 8.2 16 6z" fill="#fff"/></svg>
+      <div>
+        <h1>{{assistant}}</h1>
+        <p class="tag">{{owner}}'s AI assistant</p>
+      </div>
+    </div>
+    <button type="button" id="new-chat" class="btn secondary">New chat</button>
+  </header>
+
+  <p class="notice">
+    You are talking to an AI assistant, not to {{owner}}. {{assistant}} may make mistakes.
+    For anything important, contact them directly at <a id="contact-top" href="mailto:{{email}}">{{email}}</a>.
+  </p>
+
+  <main id="chat" class="chat" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation with {{assistant}}" tabindex="-1">
+    <div class="msg bot" id="welcome"><div class="who">{{assistant}}</div><div class="bubble" id="welcome-text">{{welcome}}</div></div>
+    <div id="starters" class="starters" role="group" aria-label="Suggested questions">
+      <button type="button" class="chip" data-q="Can you give me an overview of {{owner}}'s background?">Background</button>
+      <button type="button" class="chip" data-q="What projects has {{owner}} worked on?">Projects</button>
+      <button type="button" class="chip" data-q="What are {{owner}}'s main technical skills?">Technical skills</button>
+      <button type="button" class="chip" data-q="What kind of role is {{owner}} looking for next?">Next role</button>
+    </div>
+  </main>
+
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+
+  <form id="composer" class="composer" autocomplete="off">
+    <label for="composer-input" class="sr">Your message to {{assistant}}</label>
+    <textarea id="composer-input" name="message" rows="1" maxlength="1000" placeholder="Ask about {{owner}}'s work, skills or goals" enterkeyhint="send"></textarea>
+    <button type="submit" id="send" class="btn primary">Send</button>
+  </form>
+  <p class="foot">
+    <span id="count" aria-hidden="true"></span>
+    <span>{{assistant}} may make mistakes. Direct contact: <a id="contact-foot" href="mailto:{{email}}">{{email}}</a></span>
+  </p>
+</div>
+<script src="/app.js" defer></script>
+</body>
+</html>

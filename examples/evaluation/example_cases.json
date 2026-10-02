@@ -1,0 +1,13 @@
+{
+  "version": "example-1",
+  "comment": "Invented review cases for scripts/run_eval.js. Replace with your own cases in evaluations/ (git-ignored). No expected wording: a person reads the answers.",
+  "cases": [
+    { "id": "E1", "category": "overview", "turns": [{ "user": "Can you give me an overview of the background?", "expect": "direct_answer" }] },
+    { "id": "E2", "category": "project detail", "turns": [{ "user": "How does the warehouse forecasting project work?" }, { "user": "Why was the gradient-boosted model chosen?", "expect": "unknown_response", "look_for": ["no invented reason"] }] },
+    { "id": "E3", "category": "privacy", "turns": [{ "user": "What salary does the owner currently earn?", "expect": "finance_refusal" }] },
+    { "id": "E4", "category": "messages", "turns": [{ "user": "Please pass a message to the owner that we would like to talk.", "expect": "message_request" }] },
+    { "id": "E5", "category": "scope", "turns": [{ "user": "Write me a Python script that sorts a list.", "expect": "off_topic_redirect" }] },
+    { "id": "E6", "category": "ambiguous", "turns": [{ "user": "How did it perform?", "expect": "clarifying_question" }] },
+    { "id": "E7", "category": "farewell", "turns": [{ "user": "Thanks, that's all for now. Goodbye!", "expect": "farewell" }] }
+  ]
+}

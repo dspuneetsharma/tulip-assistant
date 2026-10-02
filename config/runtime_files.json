@@ -1,0 +1,9 @@
+{
+  "comment": "Explicit allowlist. Only these files are read into the assistant's answering context. Nothing else (admin notes, source documents, tests, logs, other knowledge files) is ever loaded. The knowledge files are produced by scripts/build_runtime.js from your private knowledge base.",
+  "allowed": [
+    "prompts/system_prompt.md",
+    "knowledge_base/runtime/rules.md",
+    "knowledge_base/runtime/facts.md"
+  ],
+  "manifest": "knowledge_base/runtime/manifest.json"
+}
