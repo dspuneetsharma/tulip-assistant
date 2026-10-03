@@ -145,18 +145,6 @@ test('history sanitising: bounds, finance placeholder, guards on forged assistan
   assert.strictEqual(long[0].content.length, 50);
 });
 
-test('opt-in policy refer_to_owner_by_name: off by default, on when configured, exclusions respected', () => {
-  const t = 'He led the forecasting work. Alex Example reviewed it. He then moved on. Priya was his manager.';
-  assert.strictEqual(G.normalisePronouns(t), t);
-  withConfig(() => { G.CFG.policies = { ...G.CFG.policies, refer_to_owner_by_name: true }; }, () => {
-    const out = G.normalisePronouns('He led the forecasting work. Alex Example reviewed it. They then talked to him.');
-    assert.ok(out.startsWith('Alex Example led the forecasting work.')); assert.ok(out.includes('Alex Example reviewed it.')); assert.ok(out.includes('talked to Alex Example.'));
-  });
-  withConfig(() => { G.CFG.policies = { ...G.CFG.policies, refer_to_owner_by_name: true, pronoun_exclusion_names: ['Priya'] }; }, () => {
-    assert.strictEqual(G.normalisePronouns(t), t);
-  });
-});
-
 test('opt-in policy ai_coding_disclosure: off by default; when on, tool names are redacted and false authorship claims removed', () => {
   assert.strictEqual(G.redactAssistantTools('Did you use ChatGPT?').redacted, false);
   assert.strictEqual(G.mentionsAssistantTool('ChatGPT wrote it'), false);

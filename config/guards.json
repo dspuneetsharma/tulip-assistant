@@ -1,15 +1,16 @@
 {
-  "_comment": "Identity, policies and fixed texts. Placeholders {{owner}}, {{assistant}} and {{email}} are filled from this file when the code loads. Edit the values below for your own deployment; keep personal knowledge in your private knowledge base (see docs/knowledge-base.md), not here.",
+  "_comment": "Identity, policies and fixed texts. Placeholders {{owner}}, {{them}} (object pronoun), {{assistant}} and {{email}} are filled from this file when the code loads. Edit the values below for your own deployment; keep personal knowledge in your private knowledge base (see docs/knowledge-base.md), not here.",
   "identity": {
     "assistant_name": "Tulip",
     "owner_reference": "Alex Example",
-    "owner_aliases": ["Alex"]
+    "owner_aliases": [
+      "Alex"
+    ],
+    "object_pronoun": "them"
   },
   "policies": {
     "_comment": "Opt-in behaviours. All false by default.",
-    "ai_coding_disclosure": false,
-    "refer_to_owner_by_name": false,
-    "pronoun_exclusion_names": []
+    "ai_coding_disclosure": false
   },
   "runtime_flags": {
     "message_saving": false,
@@ -26,16 +27,16 @@
     "unknown_detail": "That detail hasn’t been provided by {{owner}}.",
     "farewell_suffix": "",
     "authored_messaging_unavailable": "I can't save or pass on messages at the moment, so I don't want to promise that. You can reach {{owner}} directly at {{email}}.",
-    "authored_source_withheld": "That detail is withheld from {{owner}}'s public profile, so I can't confirm or name it. For further inquiry, you can email {{owner}} at {{email}}.",
+    "authored_source_withheld": "That detail is withheld from {{owner}}'s public profile, so I can't confirm or name it. For further inquiry, you can email {{them}} at {{email}}.",
     "authored_error_fallback": "I'm having trouble answering that right now. You're welcome to contact {{owner}} directly at {{email}}.",
     "authored_input_too_long": "That message is a bit long for me to handle. Could you shorten it to the key question?",
     "authored_farewell": "Thank you for your time, and do reach out to {{owner}} directly if anything else comes up.",
-    "unknown_detail_with_inquiry": "That detail hasn’t been provided by {{owner}}. Would you like to leave an inquiry for {{owner}}?",
+    "unknown_detail_with_inquiry": "That detail hasn’t been provided by {{owner}}. Would you like to leave an inquiry for {{them}}?",
     "authored_unknown_no_messaging": "Currently, I don’t have information on that. You can contact {{owner}} at {{email}} for clarification.",
     "authored_message_request_no_messaging": "I can't forward messages or inquiries yet. You can email {{owner}} directly at {{email}}.",
     "authored_source_contact": "For further inquiry, you can email {{owner}} at {{email}}.",
     "authored_source_withheld_sentence": "That detail is withheld from {{owner}}'s public profile, so I can't confirm or name it.",
-    "authored_source_withheld_with_inquiry": "That detail is withheld from {{owner}}'s public profile, so I can't confirm or name it. Would you like to leave an inquiry for {{owner}}?",
+    "authored_source_withheld_with_inquiry": "That detail is withheld from {{owner}}'s public profile, so I can't confirm or name it. Would you like to leave an inquiry for {{them}}?",
     "authored_authorship_answer": "{{owner}} led the analysis and the major decisions, and directed the AI coding assistance that handled the implementation, rather than writing every line personally.",
     "authored_authorship_brand": "{{owner}} led the analysis and the major decisions, and directed the AI coding assistance that handled the implementation. The specific tool isn't named in the approved profile, so I can't confirm or rule out any particular one.",
     "authored_claims_fallback": "I can only share what {{owner}}'s profile records, and it doesn't record more than that on this point. Is there another part of their work you'd like me to cover?",
@@ -44,6 +45,8 @@
     "authored_contact_with_messaging": "Would you like to leave an inquiry for {{owner}}?",
     "scope_refusal": "That is outside my scope, as instructed by {{owner}}.",
     "unknown_detail_no_messaging": "Currently, I don’t have information on that. You can contact {{owner}} at {{email}} for clarification.",
-    "unknown_finance_detail": "Currently, I don’t have information on that. It would be best to discuss this directly with {{owner}} at {{email}}."
+    "unknown_finance_detail": "Currently, I don’t have information on that. It would be best to discuss this directly with {{owner}} at {{email}}.",
+    "authored_contact_no_messaging_named": "You can contact {{them}} at {{email}} for clarification.",
+    "authored_contact_with_messaging_named": "Would you like to leave an inquiry for {{them}}?"
   }
 }

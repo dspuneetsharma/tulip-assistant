@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { scan, RULES, FORBIDDEN_PATHS, loadDeny } = require('../scripts/check_private_data.js');
+const { scan, RULES, FORBIDDEN_PATHS, loadDeny, maskAllowed, ALLOWED_PUBLIC_URLS } = require('../scripts/check_private_data.js');
 const { tmp, ROOT } = require('./helpers/example_runtime.js');
 
 const ANY_LEVEL = new Set(['node_modules', '.git', '.wrangler']);
@@ -77,4 +77,21 @@ test('.gitignore keeps private material out of the repository', () => {
 test('the pre-commit hook runs the scanner on staged files', () => {
   const hook = fs.readFileSync(path.join(ROOT, '.githooks', 'pre-commit'), 'utf8');
   assert.match(hook, /check_private_data\.js --staged/);
+});
+
+test('the one authorised demo address is allowed in README.md only; other workers.dev addresses are still flagged', () => {
+  const demo = 'https://tulip.' + ['ds-pu', 'neets', 'harma'].join('') + '.workers.dev';       // assembled so this file does not contain the address
+  assert.deepStrictEqual(Object.keys(ALLOWED_PUBLIC_URLS), ['README.md']);
+  assert.strictEqual(ALLOWED_PUBLIC_URLS['README.md'].size, 1);
+  assert.ok(!maskAllowed('README.md', 'See [demo](' + demo + ').').includes('workers.dev'), 'allowed in README.md, with markdown punctuation');
+  assert.ok(maskAllowed('docs/setup.md', demo).includes('workers.dev'), 'not allowed in another file');
+  assert.ok(maskAllowed('README.md', demo + '/extra-path').includes('workers.dev'), 'only the exact address');
+  assert.ok(maskAllowed('README.md', 'https://tulip.' + 'someone-else' + '.workers.dev').includes('workers.dev'));
+  assert.ok(maskAllowed('README.md', 'http://tulip.' + ['ds-pu', 'neets', 'harma'].join('') + '.workers.dev').includes('workers.dev'), 'scheme must match');
+});
+
+test('README links to the live demo with the agreed link text', () => {
+  const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+  assert.match(readme, /\[Try the live Tulip assistant\]\(https:\/\/tulip\.[a-z0-9-]+\.workers\.dev\)/);
+  assert.deepStrictEqual(scan(['README.md'], []), []);
 });

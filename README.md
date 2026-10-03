@@ -2,6 +2,8 @@
 
 A small, dependency-free toolkit for building a **personal AI representative**: an assistant that answers questions about one person (a recruiter or interviewer asks, the assistant replies in a professional, conversational voice) using **only a private knowledge base that you supply**.
 
+**[Try the live Tulip assistant](https://tulip.ds-puneetsharma.workers.dev)** — a live deployment of the assistant this toolkit was generalised from. The deployment's knowledge base is private and is not part of this repository.
+
 This repository contains reusable code and technical documentation only. It contains **no personal knowledge**: the only sample data is an invented profile ("Alex Example") used for demos and tests. You bring your own knowledge base, keep it local, and build it into the runtime and the website yourself.
 
 ## What it does

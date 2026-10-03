@@ -8,7 +8,8 @@ runs `tests/*.spec.js` with Node's built-in runner. All data is synthetic: the i
 
 | Spec | Covers |
 | --- | --- |
-| `guards.spec.js` | Fixed-answer guards, pronoun and name handling, redaction, sentence tools, opt-in policies |
+| `guards.spec.js` | Fixed-answer guards, redaction, sentence tools, opt-in policies |
+| `naming.spec.js` | Name-once rule in instructions, no automatic name or pronoun rewriting, fixed texts, contact variants |
 | `session.spec.js`, `knowledge.spec.js`, `adapters.spec.js` | Prompt assembly, history, retries, budgets, loader hash verification, adapter parsing and errors |
 | `worker_api.spec.js` | HTTP routes, validation, limits, failures, headers, no leakage of knowledge |
 | `worker_limits.spec.js` | Per-visitor and global limits, hashed IPs, purging, configuration defaults |

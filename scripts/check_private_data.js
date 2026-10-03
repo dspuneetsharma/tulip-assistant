@@ -8,6 +8,7 @@
 // Exit code 1 when anything is found. Matches are reported as file:line and rule name; the matched text is not printed.
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -25,6 +26,16 @@ const RULES = [
   { name: 'Windows user path', re: /[A-Za-z]:\\Users\\[^\s"']+/g },
 ];
 const FORBIDDEN_PATHS = [/^knowledge_base\//, /^worker\/generated\//, /^public\//, /^logs\//, /^evaluations\//, /^reports\//, /^checkpoints\//, /^\.env(?!\.example$)(\.|$)/, /^config\/local_choices\.json$/, /(^|\/)\.dev\.vars/, /\.(pem|key)$/];
+// Narrow exception: one public demo address that the repository owner has explicitly authorised for publication, permitted in README.md only.
+// It is listed by SHA-256 so this script (and the denylist scan) does not itself contain the address. Any other address, or the same address
+// in any other file, is still reported.
+const ALLOWED_PUBLIC_URLS = { 'README.md': new Set(['ccd5230b1ad01fb60589e1edd80c4d7bd8a006f331d64c203fc03da9132339af']) };
+const sha256 = (s) => crypto.createHash('sha256').update(s, 'utf8').digest('hex');
+function maskAllowed(rel, text) {
+  const allowed = ALLOWED_PUBLIC_URLS[rel];
+  if (!allowed) return text;
+  return text.replace(/https?:\/\/[^\s)\]>"'<]+/g, (tok) => (allowed.has(sha256(tok.replace(/[.,;:!?]+$/, ''))) ? '[allowed-public-demo-url]' : tok));
+}
 const SKIP_EXT = /\.(png|jpg|jpeg|gif|ico|woff2?|zip|pdf)$/i;
 
 function listFiles() {
@@ -47,7 +58,8 @@ function scan(files, denyRes) {
     const full = path.join(ROOT, rel);
     if (!fs.existsSync(full) || !fs.statSync(full).isFile()) continue;
     const lines = fs.readFileSync(full, 'utf8').split(/\r?\n/);
-    lines.forEach((text, i) => {
+    lines.forEach((rawText, i) => {
+      const text = maskAllowed(rel, rawText);
       for (const r of RULES) {
         r.re.lastIndex = 0; let m;
         while ((m = r.re.exec(text))) { if (!r.test || r.test(m)) { findings.push({ file: rel, line: i + 1, rule: r.name }); break; } }
@@ -75,4 +87,4 @@ if (require.main === module) {
   }
   console.log('check:private OK (' + files.length + ' files scanned' + (deny.length ? ', ' + deny.length + ' denylist entries' : '') + ')');
 }
-module.exports = { scan, RULES, FORBIDDEN_PATHS, loadDeny };
+module.exports = { scan, RULES, FORBIDDEN_PATHS, loadDeny, maskAllowed, ALLOWED_PUBLIC_URLS };

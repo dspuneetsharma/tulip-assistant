@@ -13,12 +13,13 @@ const RAW = require('../config/guards.json'); // a JSON require, so the same fil
 const { splitSentences, noTitle } = require('./sentences.js');
 
 // ---------- Identity and policies (config/guards.json) ----------
-// {{owner}}, {{assistant}} and {{email}} in the configured texts are filled once, when this module loads.
+// {{owner}}, {{them}}, {{assistant}} and {{email}} in the configured texts are filled once, when this module loads.
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const ID = RAW.identity;
 const OWNER = ID.owner_reference;
 const ASSISTANT = ID.assistant_name;
-const fillText = (s) => s.split('{{owner}}').join(OWNER).split('{{assistant}}').join(ASSISTANT).split('{{email}}').join(RAW.public_contact.email);
+const THEM = ID.object_pronoun || 'them';
+const fillText = (s) => s.split('{{owner}}').join(OWNER).split('{{them}}').join(THEM).split('{{assistant}}').join(ASSISTANT).split('{{email}}').join(RAW.public_contact.email);
 const deepFill = (v) => (typeof v === 'string' ? fillText(v) : Array.isArray(v) ? v.map(deepFill) : (v && typeof v === 'object') ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, deepFill(x)])) : v);
 const CFG = deepFill(RAW);
 const FIXED = CFG.fixed_text;
@@ -155,7 +156,14 @@ function leaksInternals(sentence) { return INTERNAL_LEAK.test(String(sentence ||
 const INQUIRY_OFFER = /\b(?:leave|send|submit)\s+(?:me\s+)?(?:a|an|your)\s+(?:message|inquiry|enquiry|note)\b|\b(?:would you like|shall|should|can|could|may) (?:me|i)\s+(?:to\s+)?(?:forward|pass|relay|take|save|record|send|submit|note)\b[^.?!]*\b(?:message|question|inquiry|enquiry|request|details|note)\b|\bI(?:'ll| will)\s+(?:forward|pass|relay|take|save|record|send|submit|note)\b[^.?!]*\b(?:message|question|inquiry|enquiry|request|details|note)\b/i;
 const UNKNOWN_SENTENCE = new RegExp('That detail hasn[\'’]t been provided by ' + OWNER_P + '|\\bI (?:don[\'’]t|do not) have (?:any )?information on that', 'i');
 const OFF_TOPIC_TOKEN = /\[\s*OFF[_ -]?TOPIC\s*\]/i;
-const contactTail = (flags) => (flags && flags.message_saving ? FIXED.authored_contact_with_messaging : FIXED.authored_contact_no_messaging);
+// Fixed contact sentence appended to a generated answer. When that answer already names the owner, the fixed variant that uses the object
+// pronoun is chosen, so the name is not repeated. No generated text is edited.
+const namesOwner = (t) => new RegExp(OWNER_P).test(String(t || ''));
+const contactTail = (flags, text) => {
+  const named = namesOwner(text);
+  if (flags && flags.message_saving) return named ? FIXED.authored_contact_with_messaging_named : FIXED.authored_contact_with_messaging;
+  return named ? FIXED.authored_contact_no_messaging_named : FIXED.authored_contact_no_messaging;
+};
 // While messaging is unavailable an offer to take a message is not true; it is replaced by the true next step (the public email).
 function fixInquiryOffers(text, flags) {
   if (flags && flags.message_saving) return { text, changed: false };
@@ -163,7 +171,7 @@ function fixInquiryOffers(text, flags) {
   if (!sents.some((sn) => INQUIRY_OFFER.test(sn))) return { text, changed: false };
   const kept = sents.filter((sn) => !INQUIRY_OFFER.test(sn));
   let out = kept.join(' ').trim();
-  if (!out.includes(EMAIL)) out = (out + ' ' + contactTail(flags)).trim();
+  if (!out.includes(EMAIL)) out = (out + ' ' + contactTail(flags, out)).trim();
   return { text: out || FIXED.authored_message_request_no_messaging, changed: true };
 }
 // The public email is offered once per answer.
@@ -182,16 +190,8 @@ function stripInquiryOffers(text) {
   return kept.join(' ').trim();
 }
 
-// Optional policy (config policies.refer_to_owner_by_name): visitors read the owner's name rather than "he"/"him". A sentence that
-// already names the owner keeps its natural pronoun, so the name is not stacked up inside one sentence. Answers that mention a person
-// listed in policies.pronoun_exclusion_names are left alone, so other people are never relabelled. Off by default.
-function normalisePronouns(text) {
-  if (!POLICY().refer_to_owner_by_name) return text;
-  const ex = (POLICY().pronoun_exclusion_names || []).filter(Boolean);
-  if (ex.length && new RegExp('\\b(?:' + ex.map(escapeRe).join('|') + ')\\b').test(text)) return text;
-  const named = new RegExp(OWNER_P + "(?![’'])");
-  return splitSentences(text).map((sn) => (named.test(sn) ? sn : sn.replace(/\b[Hh]e\b(?!['’])/g, OWNER).replace(/\b[Hh]im\b/g, OWNER))).join(' ');
-}
+// Naming ("{{owner}}" once per answer, then pronouns) is a prompt instruction. The application does not rewrite names or pronouns in a
+// generated answer. The only name-aware step is choosing between two fixed contact sentences (see contactTail).
 
 // ---------- False message-delivery claims ----------
 // Blocks claims that *Tulip* saved/sent/passed on a message (or can/will), while the runtime cannot.
@@ -310,8 +310,6 @@ function applyOutputGuards(text, ctx) {
   if (dc.changed) { triggered.push('contact_offered_once'); out = dc.text; }
 
   if (/\*\*[^*\n]+\*\*/.test(out)) { out = out.replace(/\*\*([^*\n]+)\*\*/g, '$1'); triggered.push('markdown_bold_removed'); }   // plain text only
-  const n = normalisePronouns(out);
-  if (n !== out) { triggered.push('pronouns_normalised'); out = n; }
 
   // After a finance refusal the next step is never an inquiry offer.
   if (c.afterFinanceRefusal && out.includes(EMAIL) && UNKNOWN_SENTENCE.test(out)) { triggered.push('finance_followup_refusal'); return { text: FIXED.financial_refusal, triggered }; }
@@ -370,6 +368,6 @@ module.exports = {
   claimsMessageHandling, falseAuthorship, leaksInternals,
   isFarewell, isPureFarewell, isOrgIntro, isIntroOnly,
   hasOffTopicToken: (t) => OFF_TOPIC_TOKEN.test(String(t || '')),
-  applyOutputGuards, trimToLastSentence, fixInquiryOffers, dedupeContact, stripInquiryOffers, normalisePronouns, contactTail,
+  applyOutputGuards, trimToLastSentence, fixInquiryOffers, dedupeContact, stripInquiryOffers, contactTail,
   splitSentences, sanitizeHistory, ClientInstructionError,
 };

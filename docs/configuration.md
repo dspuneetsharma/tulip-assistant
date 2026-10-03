@@ -7,6 +7,7 @@
 | `identity.assistant_name` | Name the assistant uses for itself (`{{assistant}}`) |
 | `identity.owner_reference` | How the assistant refers to the person it represents (`{{owner}}`) |
 | `identity.owner_aliases` | Other names or short forms recognised in questions and answers |
+| `identity.object_pronoun` | Object pronoun used in fixed texts that follow a first mention of the owner (`{{them}}`), for example "you can email {{them}}" |
 | `public_contact.email` | Public email shown on the site and in fixed texts (`{{email}}`) |
 | `runtime_flags` | `message_saving` and `external_delivery`. Both are `false`: the assistant must never claim it can save or forward a message. Only set `true` after you have implemented that capability |
 | `blocked_terms` | Terms that must never appear in answers (replaced by `redaction_token`); the runtime build also reports them if they occur in your knowledge base |
@@ -16,8 +17,12 @@
 ### Opt-in policies
 
 - `ai_coding_disclosure`: when `true`, named AI coding tools are redacted from answers, and questions about who wrote the code are answered from the `authored_authorship_*` texts. Only enable it if it matches what your knowledge base states.
-- `refer_to_owner_by_name`: when `true`, "he"/"him" in answers is replaced by the owner's name (sentences that already name the owner keep their pronoun).
-- `pronoun_exclusion_names`: names (for example of other people in projects) exempt from that normalisation.
+
+## Naming and pronouns
+
+By default an answer names the owner **once**, at the first reference, and then uses pronouns naturally; an answer that does not mention the owner does not need to name them. This is an instruction in `prompts/system_prompt.md` and in the RULES section of your knowledge base (section 2 of the example). The application never rewrites names or pronouns in a generated answer, and there is no rewrite loop. Record the owner's pronouns in your knowledge base; if none are recorded, the model is told not to guess them.
+
+Two fixed-text details support this: texts in `fixed_text` name the owner at most once (a second reference uses `{{them}}`), and when the application has to append its fixed contact sentence to a generated answer that already names the owner, it picks the variant ending `_named`, which uses `{{them}}` instead of repeating the name. A test checks that no fixed text names the owner twice.
 
 ## `config/model.json`
 

@@ -5,7 +5,7 @@
 const { splitSentences, isFragment } = require('./sentences.js');
 const G = require('./guards.js');
 const esc = (x) => String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const OWNER_RE = new RegExp(G.ownerPattern(G.OWNER) + "(?![’'])", 'g');
+const OWNER_RE = new RegExp(G.ownerPattern(G.OWNER), 'g');
 const EMAIL_RE = new RegExp(esc(G.CFG.public_contact.email), 'g');
 
 // Default facts are read lazily (Node only). The Worker and the session pass the facts in explicitly.
@@ -30,8 +30,7 @@ function observe(answer, ctx) {
   if (/\b(?:regularly|daily|day-to-day|frequently|often|routinely|extensively|as needed|each being used|heavily)\b/i.test(a)) add('frequency_wording', 'how often something is used: check that the facts record it');
   if (/\b(?:demonstrates?|demonstrated|shows?|showed|proves?|proven)\b[^.?!]{0,60}\b(?:ability|capable|capability|skills?|expertise|proficien\w*|experience)\b|\b(?:valuable|strong|extensive|deep) (?:skills?|experience|expertise)\b/i.test(a)) add('capability_claim', 'a capability or expertise is claimed: check that the facts say it');
   if (/\b(?:significantly|statistically|substantially|dramatically)\b/i.test(a)) add('magnitude_wording', 'strength wording: check against the facts');
-  if (/\b(?:he|him)\b(?!['’])/i.test(a)) add('pronoun', 'he/him used for ' + G.OWNER);
-  const names = (a.replace(EMAIL_RE, '').match(OWNER_RE) || []).length; if (names > 3) add('name_frequency', G.OWNER + ' named ' + names + ' times');
+  const names = (a.replace(EMAIL_RE, '').match(OWNER_RE) || []).length; if (names > 1) add('name_frequency', G.OWNER + ' named ' + names + ' times (once per answer expected)');
   if (a.length > 1000) add('long', a.length + ' characters');
   const frag = splitSentences(a).filter((sn) => sn.trim().split(/\s+/).length >= 3 && isFragment(sn)); if (frag.length) add('fragment', 'possible fragment: ' + frag[0].slice(0, 80));
   const email = new RegExp(esc(G.CFG.public_contact.email)).test(a); const gap = /hasn['’]t been (?:provided|confirmed|recorded)|\bnot (?:been )?(?:confirmed|recorded|provided|documented)\b|\bunconfirmed\b/i.test(a);
