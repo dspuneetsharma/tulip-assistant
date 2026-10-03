@@ -23,7 +23,7 @@ test('system prompt: template filled, rules and facts included, runtime flags st
   assert.ok(!knowledge.system.includes('{{'));
   assert.ok(knowledge.system.includes('Warehouse Demand Forecasting'));
   assert.deepStrictEqual(knowledge.info.files_loaded, ['prompts/system_prompt.md', 'knowledge_base/runtime/rules.md', 'knowledge_base/runtime/facts.md']);
-  assert.strictEqual(knowledge.info.prompt_version, '1.4');
+  assert.strictEqual(knowledge.info.prompt_version, '1.5');
 });
 
 test('a normal question makes exactly one model call with system prompt, history and the question', async () => {
